@@ -23,14 +23,7 @@ contract Arbitrage is Test {
 
     function _addLiquidity(address token0, address token1, uint256 token0Amount, uint256 token1Amount) internal {
         router.addLiquidity(
-            token0,
-            token1,
-            token0Amount,
-            token1Amount,
-            token0Amount,
-            token1Amount,
-            owner,
-            block.timestamp
+            token0, token1, token0Amount, token1Amount, token0Amount, token1Amount, owner, block.timestamp
         );
     }
 
@@ -79,6 +72,30 @@ contract Arbitrage is Test {
         /**
          * Please add your solution below
          */
+        tokenA.approve(address(router), 100 ether);
+        tokenB.approve(address(router), 100 ether);
+        tokenC.approve(address(router), 100 ether);
+        tokenD.approve(address(router), 100 ether);
+        tokenE.approve(address(router), 100 ether);
+        address[] memory path = new address[](2);
+        path[0] = address(tokenB);
+        path[1] = address(tokenD);
+        router.swapExactTokensForTokens(5 ether, 0 ether, path, arbitrager, block.timestamp);
+        path[0] = address(tokenD);
+        path[1] = address(tokenC);
+        router.swapExactTokensForTokens(1.662 ether, 0 ether, path, arbitrager, block.timestamp);
+        path[0] = address(tokenC);
+        path[1] = address(tokenE);
+        router.swapExactTokensForTokens(3.638 ether, 0 ether, path, arbitrager, block.timestamp);
+        path[0] = address(tokenE);
+        path[1] = address(tokenD);
+        router.swapExactTokensForTokens(2.128 ether, 0 ether, path, arbitrager, block.timestamp);
+        path[0] = address(tokenD);
+        path[1] = address(tokenC);
+        router.swapExactTokensForTokens(4.692 ether, 0 ether, path, arbitrager, block.timestamp);
+        path[0] = address(tokenC);
+        path[1] = address(tokenB);
+        router.swapExactTokensForTokens(6.719 ether, 0 ether, path, arbitrager, block.timestamp);
         /**
          * Please add your solution above
          */
