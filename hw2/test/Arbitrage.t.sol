@@ -83,19 +83,19 @@ contract Arbitrage is Test {
         router.swapExactTokensForTokens(5 ether, 0 ether, path, arbitrager, block.timestamp);
         path[0] = address(tokenD);
         path[1] = address(tokenC);
-        router.swapExactTokensForTokens(1.662 ether, 0 ether, path, arbitrager, block.timestamp);
+        router.swapExactTokensForTokens(1.66305254378648874 ether, 0 ether, path, arbitrager, block.timestamp);
         path[0] = address(tokenC);
         path[1] = address(tokenE);
-        router.swapExactTokensForTokens(3.638 ether, 0 ether, path, arbitrager, block.timestamp);
+        router.swapExactTokensForTokens(3.641943969529100196 ether, 0 ether, path, arbitrager, block.timestamp);
         path[0] = address(tokenE);
         path[1] = address(tokenD);
-        router.swapExactTokensForTokens(2.128 ether, 0 ether, path, arbitrager, block.timestamp);
+        router.swapExactTokensForTokens(2.131032679121271972 ether, 0 ether, path, arbitrager, block.timestamp);
         path[0] = address(tokenD);
         path[1] = address(tokenC);
-        router.swapExactTokensForTokens(4.692 ether, 0 ether, path, arbitrager, block.timestamp);
+        router.swapExactTokensForTokens(4.69972603632067882 ether, 0 ether, path, arbitrager, block.timestamp);
         path[0] = address(tokenC);
         path[1] = address(tokenB);
-        router.swapExactTokensForTokens(6.719 ether, 0 ether, path, arbitrager, block.timestamp);
+        router.swapExactTokensForTokens(6.730948454697718692 ether, 0 ether, path, arbitrager, block.timestamp);
         /**
          * Please add your solution above
          */
