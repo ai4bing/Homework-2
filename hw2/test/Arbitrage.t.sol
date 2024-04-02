@@ -77,25 +77,22 @@ contract Arbitrage is Test {
         tokenC.approve(address(router), 100 ether);
         tokenD.approve(address(router), 100 ether);
         tokenE.approve(address(router), 100 ether);
-        address[] memory path = new address[](2);
+        address[] memory path = new address[](7);
+        address[] memory path2 = new address[](4);
         path[0] = address(tokenB);
-        path[1] = address(tokenD);
+        path[1] = address(tokenA);
+        path[2] = address(tokenD);
+        path[3] = address(tokenC);
+        path[4] = address(tokenB);
+        path[5] = address(tokenE);
+        path[6] = address(tokenD);
+
+        path2[0] = address(tokenD);
+        path2[1] = address(tokenC);
+        path2[2] = address(tokenE);
+        path2[3] = address(tokenB);
         router.swapExactTokensForTokens(5 ether, 0 ether, path, arbitrager, block.timestamp);
-        path[0] = address(tokenD);
-        path[1] = address(tokenC);
-        router.swapExactTokensForTokens(1.66305254378648874 ether, 0 ether, path, arbitrager, block.timestamp);
-        path[0] = address(tokenC);
-        path[1] = address(tokenE);
-        router.swapExactTokensForTokens(3.641943969529100196 ether, 0 ether, path, arbitrager, block.timestamp);
-        path[0] = address(tokenE);
-        path[1] = address(tokenD);
-        router.swapExactTokensForTokens(2.131032679121271972 ether, 0 ether, path, arbitrager, block.timestamp);
-        path[0] = address(tokenD);
-        path[1] = address(tokenC);
-        router.swapExactTokensForTokens(4.69972603632067882 ether, 0 ether, path, arbitrager, block.timestamp);
-        path[0] = address(tokenC);
-        path[1] = address(tokenB);
-        router.swapExactTokensForTokens(6.730948454697718692 ether, 0 ether, path, arbitrager, block.timestamp);
+        router.swapExactTokensForTokens(3.034864750085148 ether, 0 ether, path2, arbitrager, block.timestamp); /*omitting the last three digits*/
         /**
          * Please add your solution above
          */

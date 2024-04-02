@@ -44,73 +44,109 @@ def getAmountOut(amountIn, reserveIn, reserveOut):
     numerator = amountInWithFee * reserveOut
     denominator = reserveIn * 1000 + amountInWithFee
     amountOut = int(numerator / denominator)
-    return amountOut
+    return amountOut if (reserveOut > amountOut) else reserveOut
 
 
-def swap(liquidity, tokenOut, tokenIn, amountIn):
-    (reserveIn, reserveOut) = getReserves(liquidity, tokenIn, tokenOut)
-    out = getAmountOut(amountIn, reserveIn, reserveOut)
-    if reserveOut * reserveIn * 1000**2 > (
-        liquidity[(tokenOut, tokenIn)][0] - out
-    ) * 1000 * (liquidity[(tokenOut, tokenIn)][1] * 1000 + amountIn * 997):
-        out = int(
-            (
-                liquidity[(tokenOut, tokenIn)][0] * 1000**2
-                - reserveOut
-                * reserveIn
-                * 1000**2
-                / int(liquidity[(tokenOut, tokenIn)][1] + amountIn * 0.997 + 1)
+def backAmountIn(betterAmountIn, out, reserveIn, reserveOut, length):
+    for i in range(length - 1, 0, -1):
+        betterAmountIn[i] = getAmountIn(out[i], reserveIn[i], reserveOut[i])
+        out[i - 1] = betterAmountIn[i]
+
+
+def swap(liquidity, path, amountIn):
+    newliquidity = {}
+    newliquidity.update(liquidity)
+    tokenIn = path[:-1]
+    tokenOut = path[1:]
+    betterAmountIn = [amountIn] + [0] * (len(path) - 1)
+    out, reserveIn, reserveOut = (
+        [0] * (len(path) - 1),
+        [0] * (len(path) - 1),
+        [0] * (len(path) - 1),
+    )
+    for i in range(len(path) - 1):
+        newliquidity.update(liquidity)
+        for j in range(i):
+            newliquidity[(tokenOut[j], tokenIn[j])] = (
+                newliquidity[(tokenOut[j], tokenIn[j])][0],
+                newliquidity[(tokenOut[j], tokenIn[j])][1] + betterAmountIn[j],
             )
-            / 1000**2
+            newliquidity[(tokenIn[j], tokenOut[j])] = (
+                newliquidity[(tokenOut[j], tokenIn[j])][1],
+                newliquidity[(tokenOut[j], tokenIn[j])][0],
+            )
+
+            newliquidity[(tokenOut[j], tokenIn[j])] = (
+                newliquidity[(tokenOut[j], tokenIn[j])][0] - out[j],
+                newliquidity[(tokenOut[j], tokenIn[j])][1],
+            )
+            newliquidity[(tokenIn[j], tokenOut[j])] = (
+                newliquidity[(tokenOut[j], tokenIn[j])][1],
+                newliquidity[(tokenOut[j], tokenIn[j])][0],
+            )
+            (reserveIn[j], reserveOut[j]) = getReserves(
+                newliquidity, tokenIn[j], tokenOut[j]
+            )
+
+        (reserveIn[i], reserveOut[i]) = getReserves(
+            newliquidity, tokenIn[i], tokenOut[i]
         )
 
-    liquidity[(tokenOut, tokenIn)] = (
-        liquidity[(tokenOut, tokenIn)][0],
-        liquidity[(tokenOut, tokenIn)][1] + amountIn,
-    )
-    liquidity[(tokenIn, tokenOut)] = (
-        liquidity[(tokenOut, tokenIn)][1],
-        liquidity[(tokenOut, tokenIn)][0],
-    )
+        out[i] = getAmountOut(betterAmountIn[i], reserveIn[i], reserveOut[i])
 
-    liquidity[(tokenOut, tokenIn)] = (
-        liquidity[(tokenOut, tokenIn)][0] - out,
-        liquidity[(tokenOut, tokenIn)][1],
-    )
-    liquidity[(tokenIn, tokenOut)] = (
-        liquidity[(tokenOut, tokenIn)][1],
-        liquidity[(tokenOut, tokenIn)][0],
-    )
+        if reserveOut[i] * reserveIn[i] * 1000**2 > (
+            reserveOut[i] - out[i]
+        ) * 1000 * (reserveIn[i] * 1000 + betterAmountIn[i] * 997):
+            out[i] = reserveOut[i] - int(
+                (
+                    reserveOut[i]
+                    * reserveIn[i]
+                    * 1000**2
+                    / (reserveIn[i] * 1000 + betterAmountIn[i] * 997)
+                    / 1000
+                )
+                + 1
+            )
+            betterAmountIn[i] = getAmountIn(out[i], reserveIn[i], reserveOut[i])
+            # backAmountIn(betterAmountIn, out, reserveIn, reserveOut, i)
 
-    return out - 92
+        betterAmountIn[i + 1] = out[i]
 
+        newliquidity[(tokenOut[i], tokenIn[i])] = (
+            newliquidity[(tokenOut[i], tokenIn[i])][0],
+            newliquidity[(tokenOut[i], tokenIn[i])][1] + betterAmountIn[i],
+        )
+        newliquidity[(tokenIn[i], tokenOut[i])] = (
+            newliquidity[(tokenOut[i], tokenIn[i])][1],
+            newliquidity[(tokenOut[i], tokenIn[i])][0],
+        )
 
-def detail_in_path(token_path, liquidity={}):
-    liquidity.update(_liquidity)
-    j = 5000000000000000000
-    k = [5000000000000000000]
-    for i in range(len(token_path) - 1):
-        j = swap(liquidity, token_path[i + 1], token_path[i], j)
-        k.append(j)
-    return k
+        newliquidity[(tokenOut[i], tokenIn[i])] = (
+            newliquidity[(tokenOut[i], tokenIn[i])][0] - out[i],
+            newliquidity[(tokenOut[i], tokenIn[i])][1],
+        )
+        newliquidity[(tokenIn[i], tokenOut[i])] = (
+            newliquidity[(tokenOut[i], tokenIn[i])][1],
+            newliquidity[(tokenOut[i], tokenIn[i])][0],
+        )
+
+    return betterAmountIn
 
 
 def after_path(token_path, liquidity={}):
     liquidity.update(_liquidity)
-    j = 5000000000000000000
-    for i in range(len(token_path) - 1):
-        j = swap(liquidity, token_path[i + 1], token_path[i], j)
+    j = swap(liquidity, token_path, 5000000000000000000)
     return j
 
 
-path_list = []
+paths_list = []
 
 
 def recursive_append_path(loop_depth, loop_ranges, token_path=["tokenB"]):
     if loop_depth == 0:
         if token_path[-1] != "tokenB":
             token_path += ["tokenB"]
-        path_list.append(token_path)
+        paths_list.append(token_path)
     else:
         for i in range(loop_ranges[loop_depth - 1]):
             if token_path[-1] != tokens[i]:
@@ -120,23 +156,20 @@ def recursive_append_path(loop_depth, loop_ranges, token_path=["tokenB"]):
 
 
 loop_ranges = []
-for i in range(5):
+for i in range(9):  # modify this for longer loops
     loop_ranges += [5]
     recursive_append_path(len(loop_ranges), loop_ranges)
 
 max = 5000000000000000000
 optimal_path = []
-optimal_path_detail = []
+betterIn = 5000000000000000000
 
-for path in path_list:
-    if after_path(path) > max:
-        optimal_path_detail = detail_in_path(path)
-        max = after_path(path)
+for path in paths_list:
+    betterAmountIn = after_path(path)
+    if 5000000000000000000 + betterAmountIn[-1] - betterAmountIn[0] > max:
+        max = 5000000000000000000 + betterAmountIn[-1] - betterAmountIn[0]
         optimal_path = path
-
-# Used for each transfer step
-# optimal_path_detail = [element / 10**18 for element in optimal_path_detail]
-# print(optimal_path_detail)
+        betterIn = betterAmountIn
 
 
 def string_for_print(path):
@@ -149,7 +182,5 @@ def string_for_print(path):
 
 print(
     "path:",
-    string_for_print(optimal_path)
-    + f"{int(optimal_path_detail[-1] / 10**12) / 1000000:.6f}"
-    + ".",
+    string_for_print(optimal_path) + f"{int(max / 10**12) / 1000000:.6f}" + ".",
 )
