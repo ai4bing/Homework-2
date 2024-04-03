@@ -6,24 +6,29 @@ Please complete the report problem below:
 
 Provide your profitable path, the amountIn, amountOut value for each swap, and your final reward (your tokenB balance).
 
-> AmountIns:
->
-> ```
-> 4.999999 5.655321 2.458781 5.088927 20.129888 1.335903 3.034864 4.310946 2.404817
-> ```
->
-> AmountOuts:
->
-> ```
-> 5.655321 2.458781 5.088927 20.129888 1.335903 3.034864 4.310946 2.404817 26.639970
-> ```
+> Solution
+
+AmountIns:
+
+```
+4.999999 5.655321 2.458781 5.088927 20.129888 1.335903 3.034864 4.310946 2.404817
+```
+
+AmountOuts:
+
+```
+5.655321 2.458781 5.088927 20.129888 1.335903 3.034864 4.310946 2.404817 26.639970
+```
 
 ## Problem 2
 
 What is slippage in AMM, and how does Uniswap V2 address this issue? Please illustrate with a function as an example.
 
-> Slippage refers to the difference between the expected price of a trade and the actual price at which the trade is executed. This discrepancy is primarily due to the impact of the trades in the pool. \
-> Uniswap V2 addresses slippage by utilizing a constant product formula to maintain a balanced liquidity pool: $x\cdot y = k$.
+> Solution
+
+Slippage refers to the difference between the expected price of a trade and the actual price at which the trade is executed. This discrepancy is primarily due to the impact of the trades in the pool.
+
+Uniswap V2 addresses slippage by utilizing a constant product formula to maintain a balanced liquidity pool: $x\cdot y = k$.
 
 ## Problem 3
 
@@ -41,7 +46,9 @@ Investigate the minting function in the UniswapV2Pair contract. When depositing 
 
 What is a sandwich attack, and how might it impact you when initiating a swap?
 
-> In a sandwich attack, a malicious actor exploits the predictability of price movements at the expense of other traders. Here's how a sandwich attack typically works:
+> Solution
+
+In a sandwich attack, a malicious actor exploits the predictability of price movements at the expense of other traders. Here's how a sandwich attack typically works:
 
 1. **Monitoring Transactions**: The attacker monitors the blockchain for pending transactions related to a specific trading pair.
 2. **Front-Running**: When the attacker detects a large trade about to occur, they quickly execute two transactions:
