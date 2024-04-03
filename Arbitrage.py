@@ -47,10 +47,13 @@ def getAmountOut(amountIn, reserveIn, reserveOut):
     return amountOut if (reserveOut > amountOut) else reserveOut
 
 
-def backAmountIn(betterAmountIn, out, reserveIn, reserveOut, length):
-    for i in range(length - 1, 0, -1):
-        betterAmountIn[i] = getAmountIn(out[i], reserveIn[i], reserveOut[i])
-        out[i - 1] = betterAmountIn[i]
+# def backAmountIn(betterAmountIn, out, reserveIn, reserveOut, length):
+#     for k in range(length - 1, 0, -1):
+#         a = getAmountIn(out[k], reserveIn[k], reserveOut[k])
+#         reserveIn[k] += a - betterAmountIn[k]
+#         reserveOut[k - 1] -= a - betterAmountIn[k]
+#         betterAmountIn[k] = a
+#         out[k - 1] = a
 
 
 def swap(liquidity, path, amountIn):
@@ -68,7 +71,7 @@ def swap(liquidity, path, amountIn):
         newliquidity.update(liquidity)
         for j in range(i):
             newliquidity[(tokenOut[j], tokenIn[j])] = (
-                newliquidity[(tokenOut[j], tokenIn[j])][0],
+                newliquidity[(tokenOut[j], tokenIn[j])][0] - out[j],
                 newliquidity[(tokenOut[j], tokenIn[j])][1] + betterAmountIn[j],
             )
             newliquidity[(tokenIn[j], tokenOut[j])] = (
@@ -76,14 +79,10 @@ def swap(liquidity, path, amountIn):
                 newliquidity[(tokenOut[j], tokenIn[j])][0],
             )
 
-            newliquidity[(tokenOut[j], tokenIn[j])] = (
-                newliquidity[(tokenOut[j], tokenIn[j])][0] - out[j],
-                newliquidity[(tokenOut[j], tokenIn[j])][1],
-            )
-            newliquidity[(tokenIn[j], tokenOut[j])] = (
-                newliquidity[(tokenOut[j], tokenIn[j])][1],
-                newliquidity[(tokenOut[j], tokenIn[j])][0],
-            )
+            # print(
+            #     newliquidity[(tokenIn[j], tokenOut[j])], (reserveIn[j], reserveOut[j])
+            # )
+
             (reserveIn[j], reserveOut[j]) = getReserves(
                 newliquidity, tokenIn[j], tokenOut[j]
             )
@@ -107,23 +106,16 @@ def swap(liquidity, path, amountIn):
                 )
                 + 1
             )
-            betterAmountIn[i] = getAmountIn(out[i], reserveIn[i], reserveOut[i])
-            # backAmountIn(betterAmountIn, out, reserveIn, reserveOut, i)
+
+        # print(out[i], reserveOut[i])
+        betterAmountIn[i] = getAmountIn(out[i], reserveIn[i], reserveOut[i])
+        # backAmountIn(betterAmountIn, out, reserveIn, reserveOut, i)
 
         betterAmountIn[i + 1] = out[i]
 
         newliquidity[(tokenOut[i], tokenIn[i])] = (
-            newliquidity[(tokenOut[i], tokenIn[i])][0],
-            newliquidity[(tokenOut[i], tokenIn[i])][1] + betterAmountIn[i],
-        )
-        newliquidity[(tokenIn[i], tokenOut[i])] = (
-            newliquidity[(tokenOut[i], tokenIn[i])][1],
-            newliquidity[(tokenOut[i], tokenIn[i])][0],
-        )
-
-        newliquidity[(tokenOut[i], tokenIn[i])] = (
             newliquidity[(tokenOut[i], tokenIn[i])][0] - out[i],
-            newliquidity[(tokenOut[i], tokenIn[i])][1],
+            newliquidity[(tokenOut[i], tokenIn[i])][1] + betterAmountIn[i],
         )
         newliquidity[(tokenIn[i], tokenOut[i])] = (
             newliquidity[(tokenOut[i], tokenIn[i])][1],
@@ -156,13 +148,13 @@ def recursive_append_path(loop_depth, loop_ranges, token_path=["tokenB"]):
 
 
 loop_ranges = []
-for i in range(9):  # modify this for longer loops
+for length in range(9):  # modify this for longer loops
     loop_ranges += [5]
     recursive_append_path(len(loop_ranges), loop_ranges)
 
 max = 5000000000000000000
 optimal_path = []
-betterIn = 5000000000000000000
+betterIn = []
 
 for path in paths_list:
     betterAmountIn = after_path(path)
@@ -179,6 +171,11 @@ def string_for_print(path):
     output += ", tokenB balance="
     return output
 
+
+# for report 1
+b = [int(x / 10**12) / 1000000 for x in betterIn]
+for c in b:
+    print(f"{c:.6f}")
 
 print(
     "path:",
