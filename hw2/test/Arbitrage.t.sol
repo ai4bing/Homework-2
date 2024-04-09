@@ -72,11 +72,8 @@ contract Arbitrage is Test {
         /**
          * Please add your solution below
          */
-        tokenA.approve(address(router), 100 ether);
-        tokenB.approve(address(router), 100 ether);
-        tokenC.approve(address(router), 100 ether);
-        tokenD.approve(address(router), 100 ether);
-        tokenE.approve(address(router), 100 ether);
+        tokenD.approve(address(router), 3.034864750085148 ether);
+
         address[] memory path = new address[](7);
         address[] memory path2 = new address[](4);
         path[0] = address(tokenB);
