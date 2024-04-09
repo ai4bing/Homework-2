@@ -87,12 +87,14 @@ contract Arbitrage is Test {
         path[5] = address(tokenE);
         path[6] = address(tokenD);
 
+        /* separate into two swaps for the (C,D)-pool to sync */
+
         path2[0] = address(tokenD);
         path2[1] = address(tokenC);
         path2[2] = address(tokenE);
         path2[3] = address(tokenB);
-        router.swapExactTokensForTokens(5 ether, 0 ether, path, arbitrager, block.timestamp);
-        router.swapExactTokensForTokens(3.034864750085148 ether, 0 ether, path2, arbitrager, block.timestamp); /*omitting the last three digits*/
+        router.swapExactTokensForTokens(5 ether, 0, path, arbitrager, block.timestamp);
+        router.swapExactTokensForTokens(3.034864750085148 ether, 0, path2, arbitrager, block.timestamp); /*omitting the last three digits*/
         /**
          * Please add your solution above
          */
